@@ -1,11 +1,12 @@
+
 from sqlalchemy import create_engine
 # este módulo será usado para posibles configuraciones
 #
 # cadena conector a la base de datos
 #
 # Sqlite
-engine = create_engine("mysql+mysqlconnector://root:gerald@localhost:3306/demo1", echo=True)
-
+engine = create_engine("mysql+pymysql://root:gerald@localhost/final01", echo=True)
+#engine = create_engine("sqlite:///final01.db") 
 
 # Mysql
 # para el uso de este dialecto en SqlAlchemy

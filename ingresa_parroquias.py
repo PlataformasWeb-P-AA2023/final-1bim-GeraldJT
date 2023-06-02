@@ -1,23 +1,25 @@
-
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import  MetaData, Table
 from configuracion import engine
-from genera_tablas import Cantones
+from genera_tablas import Canton, Parroquia
+import pandas as pd 
 Session = sessionmaker(bind=engine)
 session = Session()
-from genera_tablas import Parroquia
+from genera_tablas import Canton
 
-data = open("data/Listado-Instituciones-Educativas.csv", "r") 
-lista = data.readlines()
-lista = [l.replace(",", " ").split("|") for l in lista]
-for l in lista:
-    provincia = session.query(Cantones).filter_by(nombre=l[5]).one()  
-    parroquia = Parroquia(codDivPolPar = l[6], nombre = l[7])
-    metadata = MetaData(bind=engine)
-    tabla = Table('parroquias', metadata, autoload=True)
-    bus = tabla.select(parroquia.codDivPolPar)
-    if bus != l[6]:
-        session.add(parroquia)
+data = pd.read_csv("data/Listado-Instituciones-Educativas.csv", delimiter="|") 
+
+datosN = data.drop_duplicates(subset=['Código División Política Administrativa  Parroquia'])
+
+print(datosN)
+for  l, row in datosN.iterrows():
+    codigoC = row['Código División Política Administrativa  Cantón']
+    canton = session.query(Canton).filter_by(codDivPolCan =codigoC).one()
+    codigoP = row['Código División Política Administrativa  Parroquia']
+    nombreP = row['Parroquia']
+    print(codigoP, codigoC, nombreP)
+    parroquia = Parroquia(codDivPolPar=int(codigoP), nombre=nombreP, cantones=canton)
+    session.add(parroquia)
 
 session.commit()
+
     
